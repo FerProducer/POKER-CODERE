@@ -134,7 +134,7 @@
     <hr style="border-color:#20324e;margin:14px 0">
 
     <h3>Mi cuenta</h3>
-    <label>Jugador (demo)
+    <label>Jugador
       <input id="playerName" placeholder="Nombre">
     </label>
     <div class="two">
@@ -320,16 +320,30 @@ function ts(){return new Date().toISOString()}
 function log(action, entity, before, after){db.audit.push({ts:ts(), action, entity, before, after})}
 
 // Torneos demo
+// Helper: próxima ocurrencia del día de semana (0=Dom,1=Lun,...,6=Sáb) a la hora local dada
+function whenNext(dow, h=20, m=0){
+  const now = new Date();
+  const d   = new Date();
+  const add = (dow - d.getDay() + 7) % 7;
+  d.setDate(d.getDate() + add);
+  d.setHours(h, m, 0, 0);
+  // si es hoy pero ya pasó la hora, empuja a la próxima semana
+  if (d <= now) { d.setDate(d.getDate() + 7); }
+  return d.toISOString();
+}
+
 const demoTournaments = [
+  // Lunes — Deep Freezeout 20:00 (rentable, sencillo, 1 re-entry)
   {
-    id:"T-FO-20:00", title:"Daily Freezeout 20:00", venue:"Chihuahua", type:["freezeout"],
-    date_start:new Date(new Date().setHours(20,0,0,0)).toISOString(),
+    id:"MON-FO-20:00", title:"Lunes Deep Freezeout 20:00", venue:"Codere Casino",
+    type:["freezeout"],
+    date_start: whenNext(1,20,0),
     status:"scheduled",
     late_reg_end_level:6,
-    capacity:90,
-    buyin:{amount:800, fee:200, currency:"MXN"},
-    stack:{initial:20000, rebuy:null, addon:null},
-    reentry:{enabled:false, maxPerPlayer:0, cooldownMin:0},
+    capacity:99,
+    buyin:{amount:900, fee:90, currency:"MXN"},
+    stack:{initial:20000},
+    reentry:{enabled:true, maxPerPlayer:1, cooldownMin:0},
     rebuy:{enabled:false}, addon:{enabled:false}, alternates:true,
     blind_structure:[
       {level:1,sb:100,bb:200,ante:200,min:15},
@@ -337,23 +351,25 @@ const demoTournaments = [
       {level:3,sb:200,bb:400,ante:400,min:15},
       {level:4,sb:300,bb:600,ante:600,min:15},
       {level:5,sb:400,bb:800,ante:800,min:15},
-      {level:6,sb:600,bb:1200,ante:1200,min:15},
+      {level:6,sb:600,bb:1200,ante:1200,min:15}
     ],
     payout_schema:{mode:"percent", table:[40,25,15,10,6,4]},
-    restrictions:{maxEntriesPerPlayer:1, minAge:18},
-    rg: {bubbleProtection:false},
-    multi_day:false,
+    restrictions:{maxEntriesPerPlayer:2, minAge:18},
+    multi_day:false
   },
+
+  // Martes — Turbo Rebuy + Add-on 19:00 (volumen; rebuys/add-on sin fee)
   {
-    id:"T-PKO-18:00", title:"PKO Rebuy/Add-on Turbo 18:00", venue:"Chihuahua", type:["pko","rebuy-addon","turbo"],
-    date_start:new Date(new Date().setHours(18,0,0,0)).toISOString(),
-    status:"late-reg",
+    id:"TUE-TR-19:00", title:"Martes Turbo Rebuy + Add-on 19:00", venue:"Codere Casino",
+    type:["rebuy-addon","turbo"],
+    date_start: whenNext(2,19,0),
+    status:"scheduled",
     late_reg_end_level:8,
     capacity:126,
-    buyin:{amount:600, fee:150, bounty:300, currency:"MXN"},
-    stack:{initial:15000, rebuy:15000, addon:30000},
-    reentry:{enabled:true, maxPerPlayer:2, cooldownMin:5},
-    rebuy:{enabled:true, levels:[1,2,3,4,5,6,7,8], maxPerPlayer:4, rake:false, stack:15000, cost:600},
+    buyin:{amount:400, fee:40, currency:"MXN"},
+    stack:{initial:12000, rebuy:12000, addon:30000},
+    reentry:{enabled:true, maxPerPlayer:2, cooldownMin:0},
+    rebuy:{enabled:true, levels:[1,2,3,4,5,6,7,8], maxPerPlayer:Infinity, rake:false, stack:12000, cost:400},
     addon:{enabled:true, atLevel:8, cost:800, stack:30000, eligible:"all"},
     alternates:true,
     blind_structure:[
@@ -364,14 +380,159 @@ const demoTournaments = [
       {level:5,sb:800,bb:1600,ante:1600,min:10},
       {level:6,sb:1200,bb:2400,ante:2400,min:10},
       {level:7,sb:1500,bb:3000,ante:3000,min:10},
-      {level:8,sb:2000,bb:4000,ante:4000,min:10},
+      {level:8,sb:2000,bb:4000,ante:4000,min:10}
     ],
     payout_schema:{mode:"percent", table:[35,22,14,10,7,5,3,2,1,1]},
     restrictions:{maxEntriesPerPlayer:3, minAge:18},
-    rg: {bubbleProtection:true},
-    multi_day:false,
+    multi_day:false
+  },
+
+  // Miércoles — Black Chip Bounty 20:00 (bounty fijo, no PKO)
+  {
+    id:"WED-BCB-20:00", title:"Miércoles Black Chip Bounty 20:00", venue:"Codere Casino",
+    type:["freezeout","bounty"],
+    date_start: whenNext(3,20,0),
+    status:"scheduled",
+    late_reg_end_level:8,
+    capacity:108,
+    buyin:{amount:700, fee:70, bounty:300, currency:"MXN"},
+    stack:{initial:20000},
+    reentry:{enabled:true, maxPerPlayer:2, cooldownMin:0},
+    rebuy:{enabled:false},
+    addon:{enabled:true, atLevel:8, cost:800, stack:20000, eligible:"survivors"},
+    alternates:true,
+    blind_structure:[
+      {level:1,sb:100,bb:200,ante:200,min:15},
+      {level:2,sb:200,bb:300,ante:300,min:15},
+      {level:3,sb:200,bb:400,ante:400,min:15},
+      {level:4,sb:300,bb:600,ante:600,min:15},
+      {level:5,sb:400,bb:800,ante:800,min:15},
+      {level:6,sb:600,bb:1200,ante:1200,min:15},
+      {level:7,sb:800,bb:1600,ante:1600,min:15},
+      {level:8,sb:1000,bb:2000,ante:2000,min:15}
+    ],
+    payout_schema:{mode:"percent", table:[38,24,15,10,6,4,2,1]},
+    restrictions:{maxEntriesPerPlayer:3, minAge:18},
+    multi_day:false
+  },
+
+  // Jueves — Satélite al Sunday Major 19:30 (asientos, fee bajo, volumen)
+  {
+    id:"THU-SAT-19:30", title:"Jueves Satélite al Sunday Major 19:30", venue:"Codere Casino",
+    type:["satellite","turbo"],
+    date_start: whenNext(4,19,30),
+    status:"scheduled",
+    late_reg_end_level:8,
+    capacity:200,
+    buyin:{amount:180, fee:18, currency:"MXN"},
+    stack:{initial:10000, addon:15000},
+    reentry:{enabled:true, maxPerPlayer:Infinity, cooldownMin:0},
+    rebuy:{enabled:false},
+    addon:{enabled:true, atLevel:8, cost:300, stack:15000, eligible:"all"},
+    alternates:true,
+    blind_structure:[
+      {level:1,sb:200,bb:400,ante:400,min:12},
+      {level:2,sb:300,bb:600,ante:600,min:12},
+      {level:3,sb:400,bb:800,ante:800,min:12},
+      {level:4,sb:600,bb:1200,ante:1200,min:12},
+      {level:5,sb:800,bb:1600,ante:1600,min:12},
+      {level:6,sb:1200,bb:2400,ante:2400,min:12},
+      {level:7,sb:1500,bb:3000,ante:3000,min:12},
+      {level:8,sb:2000,bb:4000,ante:4000,min:12}
+    ],
+    payout_schema:{mode:"percent", table:[100]}, // paga en asientos (visual simple)
+    restrictions:{maxEntriesPerPlayer:Infinity, minAge:18},
+    multi_day:false
+  },
+
+  // Viernes — PKO Prime 20:00 (bounties progresivos)
+  {
+    id:"FRI-PKO-20:00", title:"Viernes PKO Prime 20:00", venue:"Codere Casino",
+    type:["pko"],
+    date_start: whenNext(5,20,0),
+    status:"scheduled",
+    late_reg_end_level:8,
+    capacity:150,
+    buyin:{amount:600, fee:60, bounty:300, currency:"MXN"},
+    stack:{initial:20000, addon:20000},
+    reentry:{enabled:true, maxPerPlayer:2, cooldownMin:0},
+    rebuy:{enabled:false},
+    addon:{enabled:true, atLevel:8, cost:500, stack:20000, eligible:"all"},
+    alternates:true,
+    blind_structure:[
+      {level:1,sb:200,bb:400,ante:400,min:12},
+      {level:2,sb:300,bb:600,ante:600,min:12},
+      {level:3,sb:400,bb:800,ante:800,min:12},
+      {level:4,sb:600,bb:1200,ante:1200,min:12},
+      {level:5,sb:800,bb:1600,ante:1600,min:12},
+      {level:6,sb:1200,bb:2400,ante:2400,min:12},
+      {level:7,sb:1500,bb:3000,ante:3000,min:12},
+      {level:8,sb:2000,bb:4000,ante:4000,min:12}
+    ],
+    payout_schema:{mode:"percent", table:[35,22,14,10,7,5,3,2,1,1]},
+    restrictions:{maxEntriesPerPlayer:3, minAge:18},
+    multi_day:false
+  },
+
+  // Sábado — Multi-Flight Day 1 (bolsea a Domingo) 19:30
+  {
+    id:"SAT-MF1-19:30", title:"Sábado Multi-Flight Day 1 (bolsear a Domingo)", venue:"Codere Casino",
+    type:["multi-day","re-entry"],
+    date_start: whenNext(6,19,30),
+    status:"scheduled",
+    late_reg_end_level:10,
+    capacity:180,
+    buyin:{amount:900, fee:90, currency:"MXN"},
+    stack:{initial:30000},
+    reentry:{enabled:true, maxPerPlayer:Infinity, cooldownMin:0},
+    rebuy:{enabled:false}, addon:{enabled:false}, alternates:true,
+    blind_structure:[
+      {level:1,sb:100,bb:200,ante:200,min:20},
+      {level:2,sb:200,bb:300,ante:300,min:20},
+      {level:3,sb:200,bb:400,ante:400,min:20},
+      {level:4,sb:300,bb:600,ante:600,min:20},
+      {level:5,sb:400,bb:800,ante:800,min:20},
+      {level:6,sb:600,bb:1200,ante:1200,min:20},
+      {level:7,sb:800,bb:1600,ante:1600,min:20},
+      {level:8,sb:1000,bb:2000,ante:2000,min:20},
+      {level:9,sb:1500,bb:3000,ante:3000,min:20},
+      {level:10,sb:2000,bb:4000,ante:4000,min:20}
+    ],
+    payout_schema:{mode:"percent", table:[40,25,15,10,6,4]},
+    restrictions:{maxEntriesPerPlayer:Infinity, minAge:18},
+    multi_day:true
+  },
+
+  // Domingo — Sunday Major 17:00 (evento principal semanal)
+  {
+    id:"SUN-MAJOR-17:00", title:"Sunday Major 17:00", venue:"Codere Casino",
+    type:["freezeout"],
+    date_start: whenNext(0,17,0),
+    status:"scheduled",
+    late_reg_end_level:8,
+    capacity:180,
+    buyin:{amount:1800, fee:180, currency:"MXN"},
+    stack:{initial:40000, addon:25000},
+    reentry:{enabled:true, maxPerPlayer:1, cooldownMin:0},
+    rebuy:{enabled:false},
+    addon:{enabled:true, atLevel:8, cost:1000, stack:25000, eligible:"survivors"},
+    alternates:true,
+    blind_structure:[
+      {level:1,sb:200,bb:400,ante:400,min:20},
+      {level:2,sb:300,bb:600,ante:600,min:20},
+      {level:3,sb:400,bb:800,ante:800,min:20},
+      {level:4,sb:600,bb:1200,ante:1200,min:20},
+      {level:5,sb:800,bb:1600,ante:1600,min:20},
+      {level:6,sb:1200,bb:2400,ante:2400,min:20},
+      {level:7,sb:1500,bb:3000,ante:3000,min:20},
+      {level:8,sb:2000,bb:4000,ante:4000,min:20}
+    ],
+    payout_schema:{mode:"percent", table:[38,24,15,10,6,4,2,1]},
+    restrictions:{maxEntriesPerPlayer:2, minAge:18},
+    multi_day:false
   }
 ];
+
 
 // Estado runtime
 const state = {
