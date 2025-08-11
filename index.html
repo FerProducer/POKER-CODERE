@@ -1,255 +1,884 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Codere Poker — App Unificada</title>
-<style>
-  :root{--bg:#0b0f16;--panel:#121826;--muted:#9fb3c8;--text:#e6eef7;--brand:#00e0a4;--danger:#ff5678;--warn:#f6b73c;--ok:#4ade80;--card:#0f1624;--border:#23324b}
-  *{box-sizing:border-box} html,body{margin:0;height:100%;font-family:system-ui,Segoe UI,Roboto;background:linear-gradient(180deg,#09101a,#0b0f16 40%,#0b0f16);color:var(--text)}
-  header{position:sticky;top:0;z-index:10;backdrop-filter:saturate(1.2) blur(8px);background:rgba(9,16,26,.7);border-bottom:1px solid var(--border)}
-  .wrap{max-width:1200px;margin:auto;padding:16px} .row{display:flex;gap:10px;align-items:center;justify-content:space-between}
-  h1{margin:0;display:flex;gap:10px;align-items:center} .badge{background:linear-gradient(90deg,#00e0a4,#38bdf8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
-  nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px} nav button{background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 12px;border-radius:10px;cursor:pointer}
-  nav button.active, .btn.primary{background:var(--brand);color:#03221a;border-color:#07a178}
-  main{display:grid;grid-template-columns:320px 1fr;gap:16px;padding:16px}
-  aside,.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
-  label{display:block;font-size:.9rem;color:var(--muted);margin:.4rem 0} input,select{width:100%;padding:10px;border-radius:10px;background:#0b1321;border:1px solid #20304a;color:var(--text)}
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
-  .chips{display:flex;flex-wrap:wrap;gap:6px}.chip{display:inline-flex;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-size:.75rem;color:var(--muted)}
-  .tag{font-size:.75rem;color:#fff;background:#071120;border:1px solid #20324e;padding:2px 8px;border-radius:999px}
-  .btn{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0d1a2b;color:var(--text);cursor:pointer}
-  .muted{color:var(--muted)} .qrbox{display:flex;align-items:center;justify-content:center;min-height:80px;border:1px dashed #38506f;border-radius:12px;background:#0b1321;color:#75a2d6}
-  .seatmap{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}.seat{background:#0f1624;border:1px solid #23324b;border-radius:10px;padding:8px}.seat.free{outline:1px solid #0ea5e9}.seat.taken{background:#12223a}
-  .alert{padding:10px;border-radius:10px;border:1px solid #30507a;background:#0b1a2b;color:#cbe2ff}.alert.warn{background:#241a07;border-color:#8f6b1e;color:#ffe9b4}.alert.danger{background:#2b0b16;border-color:#7a2035;color:#ffc0ce}
-  @media (max-width:960px){main{grid-template-columns:1fr}}
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Registro de Torneos de Póker - MVP</title>
+  <style>
+    :root{
+      --bg:#0b0f16;--panel:#121826;--muted:#9fb3c8;--text:#e6eef7;--brand:#00e0a4;--danger:#ff5678;--warn:#f6b73c;--ok:#4ade80;--card:#0f1624;--border:#23324b
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;letter-spacing:.2px;background:linear-gradient(180deg,#09101a,#0b0f16 40%,#0b0f16)}
+    header{position:sticky;top:0;z-index:10;backdrop-filter:saturate(1.2) blur(8px);background:rgba(9,16,26,.7);border-bottom:1px solid var(--border)}
+    .wrap{max-width:1200px;margin-inline:auto;padding:16px}
+    h1{margin:0;color:var(--text);display:flex;gap:10px;align-items:center}
+    h1 span.badge{background:linear-gradient(90deg,#00e0a4,#38bdf8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+    nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    nav button{background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 12px;border-radius:10px;cursor:pointer}
+    nav button.active,button.primary{background:var(--brand);color:#03221a;border-color:#07a178}
+
+    main{display:grid;grid-template-columns:280px 1fr;gap:16px;padding:16px}
+    aside,.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;color:var(--text)}
+    .filters h3{margin-top:0}
+    label{display:block;font-size:.9rem;color:var(--muted);margin:.4rem 0}
+    input,select{width:100%;padding:10px;border-radius:10px;background:#0b1321;border:1px solid #20304a;color:var(--text)}
+    .range{display:flex;gap:8px}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;color:var(--text);display:flex;flex-direction:column;gap:8px}
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-size:.75rem;color:var(--muted)}
+    .chips{display:flex;flex-wrap:wrap;gap:6px}
+    .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .row > *{margin:0}
+    .muted{color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    .btn{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0d1a2b;color:var(--text);cursor:pointer}
+    .btn.primary{background:var(--brand);color:#03221a;border-color:#09aa80}
+    .btn.ghost{background:transparent}
+    .btn.warn{background:var(--warn);color:#2a1600;border-color:#cc9a2a}
+    .btn.danger{background:var(--danger);color:white;border-color:#cc2244}
+
+    .tag{font-size:.75rem;color:#0c1b2f;background:#071120;border:1px solid #20324e;padding:2px 8px;border-radius:999px}
+
+    .section-title{margin:12px 0 6px 0;color:#cfe7ff}
+
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+    dialog::backdrop{background:rgba(4,8,16,.6)}
+    dialog{border:none;border-radius:16px;padding:0;overflow:hidden}
+    .modal{background:var(--panel);color:var(--text);border:1px solid var(--border);min-width:min(920px,92vw)}
+    .modal header{position:sticky;top:0;background:#0b1320;border-bottom:1px solid var(--border)}
+    .modal .body{padding:16px}
+
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .kpi{background:#0c1526;border:1px solid var(--border);border-radius:12px;padding:10px}
+
+    .seatmap{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+    .seat{background:#0b1321;border:1px solid #20304a;border-radius:10px;padding:8px}
+    .seat .num{font-weight:700}
+    .seat.free{outline:1px solid #0ea5e9}
+    .seat.taken{background:#12223a}
+
+    .qrbox{display:flex;align-items:center;justify-content:center;min-height:120px;border:1px dashed #38506f;border-radius:12px;background:#0b1321;color:#75a2d6}
+
+    .alert{padding:10px;border-radius:10px;border:1px solid #30507a;background:#0b1a2b;color:#cbe2ff}
+    .alert.warn{background:#241a07;border-color:#8f6b1e;color:#ffe9b4}
+    .alert.danger{background:#2b0b16;border-color:#7a2035;color:#ffc0ce}
+
+    .footnote{font-size:.8rem;color:#9ab0ca}
+
+    @media (max-width:960px){
+      main{grid-template-columns:1fr}
+      .two,.three{grid-template-columns:1fr}
+      .kpis{grid-template-columns:1fr 1fr}
+      .modal{min-width:92vw}
+    }
+    /* opción 1: usando tu variable de texto */
+.tag { color: var(--text); }
+
+/* opción 2: blanco directo, por si prefieres fijo */
+.tag { color: #fff; }
+
+/* si tienes reglas que lo pisan, forza con !important */
+.tag { color: #fff !important; }
+
+  </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <div class="row">
-      <h1>Codere Poker <span class="badge">App Unificada</span></h1>
-      <div style="display:flex;gap:8px;align-items:center">
-        <select id="role">
-          <option value="cliente">Cliente</option>
-          <option value="staff">Staff</option>
-          <option value="td">TD</option>
-        </select>
-        <button class="btn" id="applyRole">Acceder</button>
-      </div>
-    </div>
-    <nav>
-      <button id="tab-reserva" class="active" onclick="show('reserva')">Reserva</button>
-      <button id="tab-checkin" onclick="show('checkin')" hidden>Check-in</button>
-      <button id="tab-td" onclick="show('td')" hidden>Panel TD</button>
+    <h1>Codere Poker <span class="badge">Torneos Diarios</span></h1>
+    <nav aria-label="Secciones">
+      <button class="active" onclick="showSection('listado')">Listado</button>
+      <button onclick="showSection('checkin')">Check-in</button>
+      <button onclick="showSection('operacion')">Operación en vivo</button>
+      <button onclick="showSection('admin')">Panel TD</button>
+      <button onclick="showSection('reportes')">Reportes</button>
+      <button onclick="showSection('compliance')">Compliance</button>
     </nav>
   </div>
 </header>
 
 <main>
-  <aside>
-    <h3>Perfil</h3>
-    <label>Nombre <input id="pName" placeholder="Ej: Juan Pérez"></label>
-    <div class="two">
-      <label>País <input id="pCountry" placeholder="MX"></label>
-      <label>Contacto <input id="pContact" placeholder="WhatsApp o email"></label>
-    </div>
-    <label><input id="p18" type="checkbox"> Soy mayor de 18 años</label>
-    <label><input id="pRG" type="checkbox"> No estoy autoexcluido</label>
-    <button class="btn primary" id="saveProfile">Guardar perfil</button>
-
-    <hr style="border-color:#20324e;margin:14px 0">
+  <!-- FILTROS / DESCUBRIMIENTO -->
+  <aside class="filters" id="filters">
     <h3>Filtros</h3>
-    <label>Fecha <input type="date" id="fDate"></label>
+    <label>Fecha
+      <input type="date" id="fDate">
+    </label>
     <label>Modalidad
       <select id="fType">
-        <option value="">Todas</option><option>freezeout</option><option>pko</option><option>rebuy-addon</option><option>satellite</option><option>multi-day</option><option>turbo</option>
+        <option value="">Todas</option>
+        <option>freezeout</option>
+        <option>re-entry</option>
+        <option>rebuy-addon</option>
+        <option>turbo</option>
+        <option>pko</option>
+        <option>satellite</option>
+        <option>multi-day</option>
+        <option>shootout</option>
       </select>
     </label>
+    <label>Estado
+      <select id="fState">
+        <option value="">Todos</option>
+        <option value="scheduled">Programado</option>
+        <option value="late-reg">Late Reg</option>
+        <option value="running">En juego</option>
+        <option value="closed">Cerrado</option>
+      </select>
+    </label>
+    <label>Buy-in (MXN)</label>
+    <div class="range">
+      <input type="number" id="fMin" placeholder="Mín" min="0">
+      <input type="number" id="fMax" placeholder="Máx" min="0">
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button class="btn" onclick="resetFilters()">Limpiar</button>
+      <button class="btn primary" onclick="applyFilters()">Aplicar</button>
+    </div>
+
+    <hr style="border-color:#20324e;margin:14px 0">
+
+    <h3>Mi cuenta</h3>
+    <label>Jugador
+      <input id="playerName" placeholder="Nombre">
+    </label>
     <div class="two">
-      <label>Buy-in mín <input type="number" id="fMin" min="0"></label>
-      <label>Buy-in máx <input type="number" id="fMax" min="0"></label>
+      <label>Edad
+        <input id="playerAge" type="number" min="18" value="25">
+      </label>
+      <label>País
+        <input id="playerCountry" placeholder="MX">
+      </label>
     </div>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="btn" id="btnClear">Limpiar</button>
-      <button class="btn primary" id="btnApply">Aplicar</button>
-    </div>
+    <label><input type="checkbox" id="playerKYC"> KYC verificado</label>
+    <label><input type="checkbox" id="playerRG"> No estoy autoexcluido</label>
+    <button class="btn primary" onclick="savePlayer()">Guardar perfil</button>
+    <p class="footnote">La demo valida edad, KYC y Juego Responsable para flujos de compra.</p>
   </aside>
 
-  <!-- RESERVA -->
-  <section class="panel" id="reserva">
-    <h2>Reserva online (pago en sala)</h2>
+  <!-- LISTADO / TARJETAS -->
+  <section class="panel" id="listado">
+    <h2 class="section-title">Torneos de hoy</h2>
     <div id="cards" class="grid"></div>
+  </section>
 
-    <div style="margin-top:16px">
-      <h3>Mis reservas</h3>
-      <div id="myRegs"></div>
+  <!-- CHECK-IN -->
+  <section class="panel" id="checkin" hidden>
+    <h2 class="section-title">Check-in presencial u online</h2>
+    <div class="two">
+      <div>
+        <label>Escanear/pegar Ticket/QR</label>
+        <input id="qrInput" placeholder="REG-xxxx-xxxx">
+        <button class="btn primary" onclick="checkInByCode()">Check-in</button>
+        <div id="checkinResult" class="alert" style="margin-top:10px" hidden></div>
+      </div>
+      <div>
+        <label>Fallback por documento/ID jugador</label>
+        <input id="fallbackPlayerId" placeholder="player-001">
+        <button class="btn" onclick="checkInByPlayer()">Buscar</button>
+        <div id="fallbackResult" class="alert" style="margin-top:10px" hidden></div>
+      </div>
     </div>
   </section>
 
-  <!-- CHECK-IN (STAFF) -->
-  <section class="panel" id="checkin" hidden>
-    <h2>Check-in</h2>
-    <label>REG / Ticket <input id="qrInput" placeholder="REG-xxxx-xxxx"></label>
-    <button class="btn" id="doCheckin">Check-in</button>
-    <div id="checkinResult" class="alert" style="margin-top:10px" hidden></div>
+  <!-- OPERACIÓN EN VIVO / SOLICITUDES -->
+  <section class="panel" id="operacion" hidden>
+    <h2 class="section-title">Operación en vivo (Jugador/Kiosko)</h2>
+    <div class="two">
+      <div>
+        <label>ID Registro / Ticket</label>
+        <input id="liveRegId" placeholder="REG-...">
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn" onclick="requestReentry()">Solicitar Re-entry</button>
+          <button class="btn" onclick="requestRebuy()">Recompra</button>
+          <button class="btn" onclick="requestAddon()">Add-on</button>
+        </div>
+        <div id="opResult" class="alert" style="margin-top:10px" hidden></div>
+      </div>
+      <div>
+        <div class="alert warn">Notificaciones (demo): avisos de cambio de mesa, pausas, cierre de registros y comienzo de add-on.</div>
+        <ul id="liveFeed" class="muted"></ul>
+      </div>
+    </div>
   </section>
 
-  <!-- TD -->
-  <section class="panel" id="td" hidden>
-    <h2>Panel TD</h2>
-    <label>Torneo <select id="tdTournament"></select></label>
-    <div id="seatmap" class="seatmap" style="margin-top:10px"></div>
+  <!-- PANEL TD / SUPERVISOR -->
+  <section class="panel" id="admin" hidden>
+    <h2 class="section-title">Panel del Director de Torneo (TD)</h2>
+    <div class="kpis" id="kpis"></div>
+
+    <label style="margin-top:10px">Torneo
+      <select id="tdTournament" onchange="renderSeatMap()"></select>
+    </label>
+
+    <div class="two" style="margin-top:10px">
+      <div>
+        <h3>Mesa/Asientos</h3>
+        <div id="seatmap" class="seatmap"></div>
+      </div>
+      <div>
+        <h3>Alternates (Lista de espera)</h3>
+        <ol id="alternates"></ol>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn" onclick="assignAlternate()">Asignar siguiente</button>
+          <button class="btn warn" onclick="breakTable()">Break de mesa</button>
+        </div>
+        <h3 style="margin-top:16px">Acciones rápidas</h3>
+        <div class="two">
+          <button class="btn" onclick="announce('Pausa de 10 minutos')">Anunciar Pausa</button>
+          <button class="btn" onclick="announce('Cierre de Late Reg en 5 min')">Aviso Late Reg</button>
+          <button class="btn" onclick="announce('Inicio de Add-on')">Inicio Add-on</button>
+          <button class="btn danger" onclick="closeTournament()">Cerrar Torneo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORTES -->
+  <section class="panel" id="reportes" hidden>
+    <h2 class="section-title">Reportes y Auditoría</h2>
+    <div class="three">
+      <div class="kpi"><div class="muted">Conversion RFQ→Registro</div><div id="kpiConv" style="font-size:1.6rem">—</div></div>
+      <div class="kpi"><div class="muted">ARPPU</div><div id="kpiArppu" style="font-size:1.6rem">—</div></div>
+      <div class="kpi"><div class="muted">Re-entries promedio</div><div id="kpiRe" style="font-size:1.6rem">—</div></div>
+    </div>
+    <div class="section-title">Export regulatorio</div>
+    <button class="btn" onclick="exportAudit()">Exportar bitácora (JSON)</button>
+    <pre id="auditDump" class="mono" style="white-space:pre-wrap"></pre>
+  </section>
+
+  <!-- COMPLIANCE -->
+  <section class="panel" id="compliance" hidden>
+    <h2 class="section-title">Compliance & Juego Responsable</h2>
+    <ul>
+      <li>RGPD/LFPDPPP: consentimiento, portabilidad, supresión y retención configurables.</li>
+      <li>PCI DSS: tokenización, 3‑D Secure, no almacenamos PAN.</li>
+      <li>KYC/AML: verificación documental y en listas PEP/sanciones.</li>
+      <li>SEGOB/DGOJ: estructuras, reglas y reportes de regulador.</li>
+      <li>Seguridad: OAuth2/OIDC, MFA, TLS1.2+, WAF, rate limiting, webhooks firmados.</li>
+      <li>Observabilidad: logs con trazas, colas idempotentes, SLO ≥ 99.9%.</li>
+      <li>Accesibilidad: WCAG AA, i18n, monedas y husos horarios múltiples.</li>
+    </ul>
   </section>
 </main>
 
+<!-- MODAL DETALLE / COMPRA -->
+<dialog id="dlg">
+  <div class="modal">
+    <header class="wrap">
+      <div class="row">
+        <h3 id="dlgTitle" style="margin:8px 0"></h3>
+        <button class="btn ghost" onclick="dlg.close()">Cerrar</button>
+      </div>
+    </header>
+    <div class="body">
+      <div class="two">
+        <div>
+          <div id="dlgSummary" class="muted"></div>
+          <div class="chips" id="dlgTags" style="margin-top:6px"></div>
+          <h4 class="section-title">Estructura</h4>
+          <div id="dlgStructure" class="muted" style="max-height:160px;overflow:auto"></div>
+          <h4 class="section-title">Premios estimados</h4>
+          <div id="dlgPayouts" class="muted"></div>
+          <h4 class="section-title">Políticas</h4>
+          <ul id="dlgPolicies" class="muted"></ul>
+        </div>
+        <div>
+          <h4 class="section-title">Reserva / Compra</h4>
+          <label>Método
+            <select id="payMethod">
+              <option value="card">Tarjeta (3‑D Secure)</option>
+              <option value="wallet">Wallet</option>
+              <option value="ticket">Ticket de satélite</option>
+              <option value="voucher">Voucher/Promocode</option>
+              <option value="points">Puntos</option>
+            </select>
+          </label>
+          <label>Cantidad de entradas
+            <input id="qty" type="number" min="1" value="1">
+          </label>
+          <label><input type="checkbox" id="acceptRules"> Acepto Términos/TDA y House Rules</label>
+          <button class="btn primary" id="actBuy" onclick="buy()">Comprar / Registrar</button>
+          <div id="buyMsg" class="alert" hidden style="margin-top:10px"></div>
+          <h4 class="section-title">Ticket / QR</h4>
+          <div id="qr" class="qrbox">—</div>
+          <p class="footnote">El QR es demostrativo (contiene el código único de registro).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
 <script>
-const API = { base: location.origin + '/api' };
-const el = id => document.getElementById(id);
-const money = (v,c="MXN") => new Intl.NumberFormat('es-MX',{style:'currency',currency:c,maximumFractionDigits:0}).format(v);
-const state = { role:'cliente', profile:null, tournaments:[] };
+// ======= Datos base (Modelo) =======
+const db = {
+  players: new Map(), // playerId -> player
+  tournaments: new Map(), // id -> tournament
+  registrations: new Map(), // regId -> registration
+  payments: new Map(),
+  tickets: new Map(),
+  audit: [],
+};
 
-function show(view){
-  ['reserva','checkin','td'].forEach(id=>el(id).hidden = id!==view);
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  el('tab-'+view).classList.add('active');
+function uid(prefix){return `${prefix}-${Math.random().toString(36).slice(2,6)}-${Math.random().toString(36).slice(2,6)}`}
+function ts(){return new Date().toISOString()}
+function log(action, entity, before, after){db.audit.push({ts:ts(), action, entity, before, after})}
+
+// Torneos demo
+// Helper: próxima ocurrencia del día de semana (0=Dom,1=Lun,...,6=Sáb) a la hora local dada
+function whenNext(dow, h=20, m=0){
+  const now = new Date();
+  const d   = new Date();
+  const add = (dow - d.getDay() + 7) % 7;
+  d.setDate(d.getDate() + add);
+  d.setHours(h, m, 0, 0);
+  // si es hoy pero ya pasó la hora, empuja a la próxima semana
+  if (d <= now) { d.setDate(d.getDate() + 7); }
+  return d.toISOString();
 }
 
-function applyRole(){
-  state.role = el('role').value;
-  el('tab-checkin').hidden = state.role==='cliente';
-  el('tab-td').hidden = !(state.role==='td');
-  // auto volver a Reserva si ya no tienes permiso
-  if(state.role==='cliente') show('reserva');
+const demoTournaments = [
+  // Lunes — Deep Freezeout 20:00 (rentable, sencillo, 1 re-entry)
+  {
+    id:"MON-FO-20:00", title:"Lunes Deep Freezeout 20:00", venue:"Codere Casino",
+    type:["freezeout"],
+    date_start: whenNext(1,20,0),
+    status:"scheduled",
+    late_reg_end_level:6,
+    capacity:99,
+    buyin:{amount:900, fee:90, currency:"MXN"},
+    stack:{initial:20000},
+    reentry:{enabled:true, maxPerPlayer:1, cooldownMin:0},
+    rebuy:{enabled:false}, addon:{enabled:false}, alternates:true,
+    blind_structure:[
+      {level:1,sb:100,bb:200,ante:200,min:15},
+      {level:2,sb:200,bb:300,ante:300,min:15},
+      {level:3,sb:200,bb:400,ante:400,min:15},
+      {level:4,sb:300,bb:600,ante:600,min:15},
+      {level:5,sb:400,bb:800,ante:800,min:15},
+      {level:6,sb:600,bb:1200,ante:1200,min:15}
+    ],
+    payout_schema:{mode:"percent", table:[40,25,15,10,6,4]},
+    restrictions:{maxEntriesPerPlayer:2, minAge:18},
+    multi_day:false
+  },
+
+  // Martes — Turbo Rebuy + Add-on 19:00 (volumen; rebuys/add-on sin fee)
+  {
+    id:"TUE-TR-19:00", title:"Martes Turbo Rebuy + Add-on 19:00", venue:"Codere Casino",
+    type:["rebuy-addon","turbo"],
+    date_start: whenNext(2,19,0),
+    status:"scheduled",
+    late_reg_end_level:8,
+    capacity:126,
+    buyin:{amount:400, fee:40, currency:"MXN"},
+    stack:{initial:12000, rebuy:12000, addon:30000},
+    reentry:{enabled:true, maxPerPlayer:2, cooldownMin:0},
+    rebuy:{enabled:true, levels:[1,2,3,4,5,6,7,8], maxPerPlayer:Infinity, rake:false, stack:12000, cost:400},
+    addon:{enabled:true, atLevel:8, cost:800, stack:30000, eligible:"all"},
+    alternates:true,
+    blind_structure:[
+      {level:1,sb:200,bb:400,ante:400,min:10},
+      {level:2,sb:300,bb:600,ante:600,min:10},
+      {level:3,sb:400,bb:800,ante:800,min:10},
+      {level:4,sb:600,bb:1200,ante:1200,min:10},
+      {level:5,sb:800,bb:1600,ante:1600,min:10},
+      {level:6,sb:1200,bb:2400,ante:2400,min:10},
+      {level:7,sb:1500,bb:3000,ante:3000,min:10},
+      {level:8,sb:2000,bb:4000,ante:4000,min:10}
+    ],
+    payout_schema:{mode:"percent", table:[35,22,14,10,7,5,3,2,1,1]},
+    restrictions:{maxEntriesPerPlayer:3, minAge:18},
+    multi_day:false
+  },
+
+  // Miércoles — Black Chip Bounty 20:00 (bounty fijo, no PKO)
+  {
+    id:"WED-BCB-20:00", title:"Miércoles Black Chip Bounty 20:00", venue:"Codere Casino",
+    type:["freezeout","bounty"],
+    date_start: whenNext(3,20,0),
+    status:"scheduled",
+    late_reg_end_level:8,
+    capacity:108,
+    buyin:{amount:700, fee:70, bounty:300, currency:"MXN"},
+    stack:{initial:20000},
+    reentry:{enabled:true, maxPerPlayer:2, cooldownMin:0},
+    rebuy:{enabled:false},
+    addon:{enabled:true, atLevel:8, cost:800, stack:20000, eligible:"survivors"},
+    alternates:true,
+    blind_structure:[
+      {level:1,sb:100,bb:200,ante:200,min:15},
+      {level:2,sb:200,bb:300,ante:300,min:15},
+      {level:3,sb:200,bb:400,ante:400,min:15},
+      {level:4,sb:300,bb:600,ante:600,min:15},
+      {level:5,sb:400,bb:800,ante:800,min:15},
+      {level:6,sb:600,bb:1200,ante:1200,min:15},
+      {level:7,sb:800,bb:1600,ante:1600,min:15},
+      {level:8,sb:1000,bb:2000,ante:2000,min:15}
+    ],
+    payout_schema:{mode:"percent", table:[38,24,15,10,6,4,2,1]},
+    restrictions:{maxEntriesPerPlayer:3, minAge:18},
+    multi_day:false
+  },
+
+  // Jueves — Satélite al Sunday Major 19:30 (asientos, fee bajo, volumen)
+  {
+    id:"THU-SAT-19:30", title:"Jueves Satélite al Sunday Major 19:30", venue:"Codere Casino",
+    type:["satellite","turbo"],
+    date_start: whenNext(4,19,30),
+    status:"scheduled",
+    late_reg_end_level:8,
+    capacity:200,
+    buyin:{amount:180, fee:18, currency:"MXN"},
+    stack:{initial:10000, addon:15000},
+    reentry:{enabled:true, maxPerPlayer:Infinity, cooldownMin:0},
+    rebuy:{enabled:false},
+    addon:{enabled:true, atLevel:8, cost:300, stack:15000, eligible:"all"},
+    alternates:true,
+    blind_structure:[
+      {level:1,sb:200,bb:400,ante:400,min:12},
+      {level:2,sb:300,bb:600,ante:600,min:12},
+      {level:3,sb:400,bb:800,ante:800,min:12},
+      {level:4,sb:600,bb:1200,ante:1200,min:12},
+      {level:5,sb:800,bb:1600,ante:1600,min:12},
+      {level:6,sb:1200,bb:2400,ante:2400,min:12},
+      {level:7,sb:1500,bb:3000,ante:3000,min:12},
+      {level:8,sb:2000,bb:4000,ante:4000,min:12}
+    ],
+    payout_schema:{mode:"percent", table:[100]}, // paga en asientos (visual simple)
+    restrictions:{maxEntriesPerPlayer:Infinity, minAge:18},
+    multi_day:false
+  },
+
+  // Viernes — PKO Prime 20:00 (bounties progresivos)
+  {
+    id:"FRI-PKO-20:00", title:"Viernes PKO Prime 20:00", venue:"Codere Casino",
+    type:["pko"],
+    date_start: whenNext(5,20,0),
+    status:"scheduled",
+    late_reg_end_level:8,
+    capacity:150,
+    buyin:{amount:600, fee:60, bounty:300, currency:"MXN"},
+    stack:{initial:20000, addon:20000},
+    reentry:{enabled:true, maxPerPlayer:2, cooldownMin:0},
+    rebuy:{enabled:false},
+    addon:{enabled:true, atLevel:8, cost:500, stack:20000, eligible:"all"},
+    alternates:true,
+    blind_structure:[
+      {level:1,sb:200,bb:400,ante:400,min:12},
+      {level:2,sb:300,bb:600,ante:600,min:12},
+      {level:3,sb:400,bb:800,ante:800,min:12},
+      {level:4,sb:600,bb:1200,ante:1200,min:12},
+      {level:5,sb:800,bb:1600,ante:1600,min:12},
+      {level:6,sb:1200,bb:2400,ante:2400,min:12},
+      {level:7,sb:1500,bb:3000,ante:3000,min:12},
+      {level:8,sb:2000,bb:4000,ante:4000,min:12}
+    ],
+    payout_schema:{mode:"percent", table:[35,22,14,10,7,5,3,2,1,1]},
+    restrictions:{maxEntriesPerPlayer:3, minAge:18},
+    multi_day:false
+  },
+
+  // Sábado — Multi-Flight Day 1 (bolsea a Domingo) 19:30
+  {
+    id:"SAT-MF1-19:30", title:"Sábado Multi-Flight Day 1 (bolsear a Domingo)", venue:"Codere Casino",
+    type:["multi-day","re-entry"],
+    date_start: whenNext(6,19,30),
+    status:"scheduled",
+    late_reg_end_level:10,
+    capacity:180,
+    buyin:{amount:900, fee:90, currency:"MXN"},
+    stack:{initial:30000},
+    reentry:{enabled:true, maxPerPlayer:Infinity, cooldownMin:0},
+    rebuy:{enabled:false}, addon:{enabled:false}, alternates:true,
+    blind_structure:[
+      {level:1,sb:100,bb:200,ante:200,min:20},
+      {level:2,sb:200,bb:300,ante:300,min:20},
+      {level:3,sb:200,bb:400,ante:400,min:20},
+      {level:4,sb:300,bb:600,ante:600,min:20},
+      {level:5,sb:400,bb:800,ante:800,min:20},
+      {level:6,sb:600,bb:1200,ante:1200,min:20},
+      {level:7,sb:800,bb:1600,ante:1600,min:20},
+      {level:8,sb:1000,bb:2000,ante:2000,min:20},
+      {level:9,sb:1500,bb:3000,ante:3000,min:20},
+      {level:10,sb:2000,bb:4000,ante:4000,min:20}
+    ],
+    payout_schema:{mode:"percent", table:[40,25,15,10,6,4]},
+    restrictions:{maxEntriesPerPlayer:Infinity, minAge:18},
+    multi_day:true
+  },
+
+  // Domingo — Sunday Major 17:00 (evento principal semanal)
+  {
+    id:"SUN-MAJOR-17:00", title:"Sunday Major 17:00", venue:"Codere Casino",
+    type:["freezeout"],
+    date_start: whenNext(0,17,0),
+    status:"scheduled",
+    late_reg_end_level:8,
+    capacity:180,
+    buyin:{amount:1800, fee:180, currency:"MXN"},
+    stack:{initial:40000, addon:25000},
+    reentry:{enabled:true, maxPerPlayer:1, cooldownMin:0},
+    rebuy:{enabled:false},
+    addon:{enabled:true, atLevel:8, cost:1000, stack:25000, eligible:"survivors"},
+    alternates:true,
+    blind_structure:[
+      {level:1,sb:200,bb:400,ante:400,min:20},
+      {level:2,sb:300,bb:600,ante:600,min:20},
+      {level:3,sb:400,bb:800,ante:800,min:20},
+      {level:4,sb:600,bb:1200,ante:1200,min:20},
+      {level:5,sb:800,bb:1600,ante:1600,min:20},
+      {level:6,sb:1200,bb:2400,ante:2400,min:20},
+      {level:7,sb:1500,bb:3000,ante:3000,min:20},
+      {level:8,sb:2000,bb:4000,ante:4000,min:20}
+    ],
+    payout_schema:{mode:"percent", table:[38,24,15,10,6,4,2,1]},
+    restrictions:{maxEntriesPerPlayer:2, minAge:18},
+    multi_day:false
+  }
+];
+
+
+// Estado runtime
+const state = {
+  filters:{},
+  currentTournament:null,
+  currentPlayer:null,
+  liveLevel: new Map(), // tournamentId -> level
+  seats: new Map(), // tournamentId -> {tables: [...], taken:Set}
+  alternates: new Map(), // tournamentId -> array of playerIds (FIFO)
+};
+
+// Inicializar DB
+function init(){
+  demoTournaments.forEach(t=>db.tournaments.set(t.id, t));
+  // crear estructura de asientos
+  db.tournaments.forEach(t=>{
+    const perTable = 9; // estándar
+    const tables = Math.ceil(t.capacity / perTable);
+    const seatset = new Set();
+    const grid=[];
+    for(let table=1; table<=tables; table++){
+      const seats=[];
+      for(let s=1; s<=perTable; s++){
+        const seatId = `${table}-${s}`;
+        seats.push({table, seat:s, id:seatId, regId:null});
+      }
+      grid.push(seats);
+    }
+    state.seats.set(t.id, {perTable, tables:grid, taken:seatset});
+    state.liveLevel.set(t.id, 1);
+    state.alternates.set(t.id, []);
+  });
+  renderList();
+  fillTDSelect();
+  loadPlayerFromStorage();
 }
 
-function loadProfile(){
-  try{ const s=localStorage.getItem('clientProfile'); if(!s) return;
-    const p=JSON.parse(s); state.profile=p;
-    el('pName').value=p.name||''; el('pCountry').value=p.country||''; el('pContact').value=p.contact||'';
-    el('p18').checked=!!p.adult; el('pRG').checked=!!p.rgok;
-  }catch{}
-}
-function saveProfile(){
-  const name=el('pName').value.trim(), country=el('pCountry').value.trim()||'MX', contact=el('pContact').value.trim();
-  const adult=el('p18').checked, rgok=el('pRG').checked;
-  const pid = name? name.toLowerCase().replace(/\s+/g,'-') : `player-${Math.random().toString(36).slice(2,8)}`;
-  const p={id:pid,name,country,contact,adult,rgok}; localStorage.setItem('clientProfile', JSON.stringify(p)); state.profile=p; alert('Perfil guardado');
-}
+// ======= UI Helpers =======
+function money(v,c="MXN"){return new Intl.NumberFormat('es-MX',{style:'currency',currency:c,maximumFractionDigits:0}).format(v)}
+function el(id){return document.getElementById(id)}
+function showSection(id){["listado","checkin","operacion","admin","reportes","compliance"].forEach(s=>{el(s).hidden = s!==id})}
+function resetFilters(){el('fDate').value="";el('fType').value="";el('fState').value="";el('fMin').value="";el('fMax').value="";applyFilters()}
+function applyFilters(){state.filters={date:el('fDate').value,type:el('fType').value,state:el('fState').value,min:el('fMin').value,max:el('fMax').value};renderList()}
 
-async function fetchTournaments(){
-  const r = await fetch(`${API.base}/tournaments`); state.tournaments = await r.json(); renderList(); fillTdSelect();
-}
-function resetFilters(){ el('fDate').value=""; el('fType').value=""; el('fMin').value=""; el('fMax').value=""; renderList(); }
-function applyFilters(){ renderList(); }
-
+// ======= Listado =======
 function renderList(){
-  const box = el('cards'); box.innerHTML='';
-  const f = { date:el('fDate').value, type:el('fType').value, min:el('fMin').value, max:el('fMax').value };
-  const items = state.tournaments.filter(t=>{
-    const d=new Date(t.date_start);
+  const box = el('cards');
+  box.innerHTML="";
+  const list = [...db.tournaments.values()].filter(t=>{
+    const f = state.filters; const d = new Date(t.date_start);
     if(f.date){const fd=new Date(f.date); if(d.toDateString()!=fd.toDateString()) return false}
     if(f.type && !t.type.includes(f.type)) return false;
+    if(f.state && t.status!==f.state) return false;
     const total = t.buyin.amount + (t.buyin.fee||0) + (t.buyin.bounty||0);
     if(f.min && total < +f.min) return false;
     if(f.max && total > +f.max) return false;
     return true;
   }).sort((a,b)=>new Date(a.date_start)-new Date(b.date_start));
-  items.forEach(t=>{
+
+  list.forEach(t=>{
     const total = t.buyin.amount + (t.buyin.fee||0) + (t.buyin.bounty||0);
-    const div=document.createElement('div'); div.className='card';
+    const div = document.createElement('div'); div.className='card';
     div.innerHTML = `
       <div class="row"><h3 style="margin:0">${t.title}</h3><span class="tag">${new Date(t.date_start).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}</span></div>
-      <div class="chips">${t.type.map(x=>`<span class="chip">${x}</span>`).join('')}
-        <span class="chip">cap ${t.capacity}</span><span class="chip">late reg L${t.late_reg_end_level}</span></div>
+      <div class="chips">
+        ${t.type.map(x=>`<span class="chip">${x}</span>`).join('')}
+        ${t.alternates?`<span class="chip">alternates</span>`:''}
+        <span class="chip">cap ${t.capacity}</span>
+        <span class="chip">late reg L${t.late_reg_end_level}</span>
+      </div>
       <div class="two">
         <div class="muted">Buy-in ${money(t.buyin.amount)} ${t.buyin.fee?'+ fee '+money(t.buyin.fee):''} ${t.buyin.bounty?'+ bounty '+money(t.buyin.bounty):''}</div>
         <div class="muted">Stack inicial ${t.stack.initial.toLocaleString()} fichas</div>
       </div>
-      <div class="row"><button class="btn" onclick='reserve("${t.id}")'>Reservar</button></div>`;
+      <div class="row">
+        <button class="btn" onclick="openDetail('${t.id}')">Detalles</button>
+        <button class="btn primary" onclick="startBuy('${t.id}')">Registrar</button>
+      </div>
+    `;
     box.appendChild(div);
   });
-  renderMyRegs();
 }
 
-async function reserve(tid){
-  const t = state.tournaments.find(x=>x.id===tid);
-  const p = state.profile;
-  if(!p){ alert('Guarda tu perfil primero.'); return; }
-  if(!p.adult) return alert('Debes ser mayor de 18.');
-  if(!p.rgok) return alert('No puedes reservar si estás autoexcluido.');
-  try{
-    const resp = await fetch(`${API.base}/reserve`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ tournamentId: t.id, qty:1, player:{ id:p.id || p.name.toLowerCase().replace(/\s+/g,'-'), name:p.name||'Cliente' } })
-    });
-    const data = await resp.json(); if(!resp.ok) throw new Error(data.error||'Error');
-    const r = data.regs[0];
-    alert(`Reserva creada: ${r.id} — ${r.seat_id ? `Mesa ${r.seat_id.split('-')[0]} S${r.seat_id.split('-')[1]}` : 'Waitlist'}`);
-    // guarda local
-    const my = JSON.parse(localStorage.getItem('myRegs')||'[]');
-    my.push({ id:r.id, tournament:t.title, date:t.date_start, seat:r.seat_id });
-    localStorage.setItem('myRegs', JSON.stringify(my));
-    renderMyRegs();
-  }catch(e){ alert('No se pudo reservar: '+e.message); }
+// ======= Detalle / Compra =======
+const dlg = el('dlg');
+function openDetail(tid){
+  const t = db.tournaments.get(tid); state.currentTournament = t;
+  el('dlgTitle').textContent = `${t.title} — ${t.venue}`;
+  el('dlgSummary').innerHTML = `Inicio: <b>${new Date(t.date_start).toLocaleString('es-MX')}</b><br>
+   Estado: <b>${t.status}</b><br>
+   Buy-in total: <b>${money(t.buyin.amount+(t.buyin.fee||0)+(t.buyin.bounty||0))}</b>`;
+  el('dlgTags').innerHTML = [
+    ...t.type,
+    t.reentry.enabled?`re-entry max ${t.reentry.maxPerPlayer}`:null,
+    t.rebuy?.enabled?`rebuy L${t.rebuy.levels?.join(',')}`:null,
+    t.addon?.enabled?`add-on L${t.addon.atLevel}`:null,
+    t.alternates?"alternates":null
+  ].filter(Boolean).map(x=>`<span class="chip">${x}</span>`).join('');
+  el('dlgStructure').innerHTML = `<table class="muted" style="width:100%"><thead><tr><th style="text-align:left">Lv</th><th>SB</th><th>BB</th><th>Ante</th><th>min</th></tr></thead><tbody>${t.blind_structure.map(l=>`<tr><td>${l.level}</td><td>${l.sb}</td><td>${l.bb}</td><td>${l.ante}</td><td>${l.min}</td></tr>`).join('')}</tbody></table>`;
+  el('dlgPayouts').innerHTML = (function(){
+    const entrants = countEntrants(t.id);
+    const pool = entrants * (t.buyin.amount + (t.rebuy?.enabled?0:0)); // simplificado: solo entradas iniciales
+    if(t.payout_schema.mode==='percent'){
+      const rows = t.payout_schema.table.map((p,i)=>`<tr><td>${i+1}</td><td>${p}%</td><td>${money(Math.round(pool*p/100))}</td></tr>`).join('');
+      return `<table class="muted" style="width:100%"><thead><tr><th>Lugar</th><th>%</th><th>Monto</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+    return '—';
+  })();
+  el('dlgPolicies').innerHTML = `
+    <li>Re-entry: ${t.reentry.enabled?`hasta nivel ${t.late_reg_end_level}, máx ${t.reentry.maxPerPlayer} por jugador`:'no aplica'}</li>
+    <li>Rebuy: ${t.rebuy?.enabled?`niveles ${t.rebuy.levels.join(', ')}, costo ${money(t.rebuy.cost)}${t.rebuy.rake?'+fee':''}`:'no aplica'}</li>
+    <li>Add-on: ${t.addon?.enabled?`nivel ${t.addon.atLevel}, costo ${money(t.addon.cost)}, stack ${t.addon.stack.toLocaleString()}`:'no aplica'}</li>
+    <li>Alternates: ${t.alternates?'sí, prioridad FIFO':'no'}</li>`;
+  dlg.showModal();
 }
 
-function renderMyRegs(){
-  const box = el('myRegs'); const list = JSON.parse(localStorage.getItem('myRegs')||'[]');
-  if(!list.length){ box.innerHTML = '<div class="muted">Sin reservas aún.</div>'; return; }
-  box.innerHTML = '<div class="grid">'+ list.slice().reverse().map(r=>{
-    const seat = r.seat ? `• Mesa ${r.seat.split('-')[0]} • S${r.seat.split('-')[1]}` : '• (waitlist)';
-    return `<div class="card"><div class="row"><h4 style="margin:0">${r.tournament}</h4>
-    <span class="tag">${new Date(r.date).toLocaleDateString('es-MX',{weekday:'short',hour:'2-digit',minute:'2-digit'})}</span></div>
-    <div class="muted">REG: <b>${r.id}</b> ${seat}</div></div>`;
-  }).join('') + '</div>';
+function startBuy(tid){openDetail(tid)}
+
+function ensureEligibility(player,t){
+  if(!player) return {ok:false,msg:'Inicia sesión demo y guarda tu perfil.'}
+  if((player.age||0) < (t.restrictions.minAge||18)) return {ok:false,msg:'No cumples la edad mínima.'}
+  if(!player.kyc) return {ok:false,msg:'KYC no verificado.'}
+  if(!player.rg_ok) return {ok:false,msg:'Estado de autoexclusión activo.'}
+  return {ok:true}
 }
 
-// Staff check-in
-async function doCheckin(){
-  const code = el('qrInput').value.trim(); const box=el('checkinResult');
-  if(!code){ box.hidden=false; box.className='alert danger'; box.textContent='Ingresa un REG.'; return; }
-  try{
-    const resp = await fetch(`${API.base}/checkin`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({regId:code}) });
-    const data = await resp.json(); if(!resp.ok) throw new Error(data.error||'Error');
-    const r = data.reg; const [mesa,silla] = (r.seat_id||'- -').split('-');
-    box.hidden=false; box.className='alert'; box.textContent = `Check-in OK. Mesa ${mesa} • S${silla} (REG ${r.id})`;
-  }catch(e){
-    box.hidden=false; box.className='alert danger'; box.textContent='Error: '+e.message;
+function countEntrants(tid){let c=0; db.registrations.forEach(r=>{if(r.tournament_id===tid && r.type==='entry') c++}); return c}
+function takenForPlayer(tid,pid,types=['entry','reentry']){let c=0; db.registrations.forEach(r=>{if(r.tournament_id===tid && r.player_id===pid && types.includes(r.type)) c++}); return c}
+function currentLevel(tid){return state.liveLevel.get(tid)||1}
+
+function buy(){
+  const t = state.currentTournament; const p = state.currentPlayer; const qty = Math.max(1, +el('qty').value||1);
+  if(!el('acceptRules').checked){msg('buyMsg','Debes aceptar Términos/TDA','danger');return}
+  const eg = ensureEligibility(p,t); if(!eg.ok){msg('buyMsg',eg.msg,'danger');return}
+  // Validar límite por jugador
+  const already = takenForPlayer(t.id,p.id,['entry']);
+  if(already>= (t.restrictions.maxEntriesPerPlayer||1)){
+    msg('buyMsg','Límite de entradas alcanzado para este torneo.','danger');return
   }
+  const totalRequested = Math.min(qty, (t.restrictions.maxEntriesPerPlayer||1)-already);
+  if(totalRequested <=0){msg('buyMsg','No puedes adquirir más entradas.','danger');return}
+
+  // Aforo atómico simple (demo)
+  const free = t.capacity - countEntrants(t.id);
+  if(free<=0){
+    // Alternates
+    state.alternates.get(t.id).push(p.id);
+    log('alternate.join', 'Tournament', null, {tournament:t.id, player:p.id});
+    msg('buyMsg','Aforo completo. Te hemos añadido como Alternate (FIFO).','warn');
+    renderSeatMap();
+    return
+  }
+
+  const regs=[];
+  for(let i=0;i<totalRequested;i++){
+    const regId = uid('REG');
+    const seat = assignSeat(t.id, regId);
+    const r = { id:regId, player_id:p.id, tournament_id:t.id, type:'entry', status:'reserved', created_at:ts(), payment_id:null, seat_id:seat?.id||null, stack_awarded:t.stack.initial };
+    db.registrations.set(regId,r);
+    regs.push(r);
+    log('register.entry','Registration',null,r);
+  }
+
+  // Pago simulado
+  const amount = totalRequested*(t.buyin.amount + (t.buyin.fee||0) + (t.buyin.bounty||0));
+  const pay = {id:uid('PAY'), method:el('payMethod').value, amount, currency:t.buyin.currency, status:'captured', captured_at:ts()};
+  db.payments.set(pay.id,pay);
+  regs.forEach(r=>{r.payment_id=pay.id; r.status='confirmed'});
+  const codes = regs.map(r=>r.id).join(', ');
+  el('qr').textContent = codes; // placeholder QR
+  msg('buyMsg',`¡Listo! Registro confirmado. Código: ${codes}. Total ${money(amount,t.buyin.currency)}.`,'ok');
+  renderList();renderSeatMap();updateKPIs();
 }
 
-// TD seatmap
-async function fillTdSelect(){
-  const sel = el('tdTournament'); sel.innerHTML='';
-  state.tournaments.forEach(t=>{ const o=document.createElement('option'); o.value=t.id; o.textContent=`${t.title} (${t.venue})`; sel.appendChild(o); });
-  sel.onchange = renderSeatmap;
-  if(state.tournaments.length){ sel.value = state.tournaments[0].id; renderSeatmap(); }
+function msg(id, text, tone='ok'){
+  const box = el(id); box.hidden = false; box.textContent = text; box.className = `alert ${tone==='warn'?'warn':tone==='danger'?'danger':''}`;
 }
-async function renderSeatmap(){
-  const tid = el('tdTournament').value;
-  const res = await fetch(`${API.base}/seatmap/${tid}`); const j = await res.json();
-  const box = el('seatmap'); box.innerHTML='';
-  j.grid.forEach(row=>{
+
+// ======= Asientos / RNG =======
+function assignSeat(tid, regId){
+  const seatState = state.seats.get(tid);
+  for(const row of seatState.tables){
+    for(const seat of row){
+      if(!db.registrations.has(seat.regId) && !seatState.taken.has(seat.id)){
+        seat.regId = regId; seatState.taken.add(seat.id); return seat;
+      }
+    }
+  }
+  return null;
+}
+
+function renderSeatMap(){
+  const select = el('tdTournament');
+  let tid = select.value || demoTournaments[0].id;
+  select.value = tid;
+  const seatState = state.seats.get(tid);
+  const box = el('seatmap'); box.innerHTML = '';
+  seatState.tables.forEach(row=>{
     row.forEach(seat=>{
-      const d=document.createElement('div'); d.className='seat ' + (seat.regId?'taken':'free');
-      d.innerHTML = `<div>M${seat.table} • S${seat.seat}</div><div class="muted">${seat.regId||'Libre'}</div>`;
-      box.appendChild(d);
+      const div=document.createElement('div'); div.className='seat '+(seat.regId?'taken':'free');
+      div.innerHTML = `<div class="num">Mesa ${seat.table} • S${seat.seat}</div><div class="muted">${seat.regId||'Libre'}</div>`;
+      box.appendChild(div);
     });
   });
+  // Alternates list
+  const altBox = el('alternates'); altBox.innerHTML='';
+  state.alternates.get(tid).forEach((pid,i)=>{
+    const li=document.createElement('li'); li.textContent = `${i+1}. ${db.players.get(pid)?.name||pid}`; altBox.appendChild(li);
+  });
+  // KPIs
+  updateKPIs();
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  loadProfile();
-  fetchTournaments();
-  el('applyRole').onclick = applyRole;
-  el('saveProfile').onclick = saveProfile;
-  el('btnClear').onclick = resetFilters;
-  el('btnApply').onclick = applyFilters;
-  el('doCheckin').onclick = doCheckin;
-});
+function fillTDSelect(){
+  const sel = el('tdTournament'); sel.innerHTML='';
+  db.tournaments.forEach(t=>{const o=document.createElement('option'); o.value=t.id; o.textContent = `${t.title} (${t.venue})`; sel.appendChild(o)});
+  renderSeatMap();
+}
+
+function assignAlternate(){
+  const tid = el('tdTournament').value; const q = state.alternates.get(tid); if(!q.length){alert('No hay alternates'); return}
+  const pid = q.shift();
+  const regId = uid('REG'); const seat = assignSeat(tid, regId);
+  const r = { id:regId, player_id:pid, tournament_id:tid, type:'entry', status:'confirmed', created_at:ts(), payment_id:null, seat_id:seat?.id||null, stack_awarded:db.tournaments.get(tid).stack.initial };
+  db.registrations.set(regId,r); log('alternate.assigned','Registration',null,r);
+  renderSeatMap(); announce(`Alternate asignado: ${db.players.get(pid)?.name||pid}`);
+}
+
+function breakTable(){announce('Break de mesa ejecutado (demo). Balanceando mesas…')}
+
+// ======= Check-in =======
+function checkInByCode(){
+  const code = el('qrInput').value.trim(); const r = db.registrations.get(code);
+  const box = el('checkinResult');
+  if(!r){box.hidden=false; box.className='alert danger'; box.textContent='Registro no encontrado.'; return}
+  r.status='checked-in'; box.hidden=false; box.className='alert'; box.textContent=`Check-in ok. Mesa ${r.seat_id?.split('-')[0]} • S${r.seat_id?.split('-')[1]}`; log('checkin','Registration',null,{id:r.id}); renderSeatMap();
+}
+function checkInByPlayer(){
+  const pid = el('fallbackPlayerId').value.trim(); const box=el('fallbackResult');
+  const list=[...db.registrations.values()].filter(r=>r.player_id===pid);
+  if(!list.length){box.hidden=false; box.className='alert danger'; box.textContent='Sin registros activos.'; return}
+  box.hidden=false; box.className='alert'; box.textContent = `Encontrados ${list.length} registros. Último: ${list[list.length-1].id}`;
+}
+
+// ======= Operación en vivo: Re-entry / Rebuy / Add-on =======
+function getReg(regId){return db.registrations.get(regId)}
+function requestReentry(){
+  const id = el('liveRegId').value.trim(); const r=getReg(id); const out = el('opResult');
+  if(!r){return showOp('Registro no encontrado', 'danger')}
+  const t = db.tournaments.get(r.tournament_id);
+  if(!t.reentry.enabled) return showOp('Este torneo no permite re-entry', 'danger');
+  if(currentLevel(t.id) > t.late_reg_end_level) return showOp('La ventana de re-entry está cerrada', 'danger');
+  const entries = takenForPlayer(t.id, r.player_id, ['entry','reentry']);
+  if(entries >= (t.reentry.maxPerPlayer||0)+1) return showOp('Excediste el máximo de re-entradas', 'danger');
+  const regId = uid('REG'); const seat = assignSeat(t.id, regId);
+  const reg = { id:regId, player_id:r.player_id, tournament_id:t.id, type:'reentry', status:'confirmed', created_at:ts(), payment_id:uid('PAY'), seat_id:seat?.id||null, stack_awarded:t.stack.initial };
+  db.registrations.set(regId, reg); log('register.reentry','Registration',null,reg);
+  showOp(`Re-entry confirmado (${regId}). Mesa ${seat?.table} S${seat?.seat}`,'ok'); renderSeatMap(); updateKPIs();
+}
+function requestRebuy(){
+  const id = el('liveRegId').value.trim(); const r=getReg(id); if(!r) return showOp('Registro no encontrado','danger');
+  const t = db.tournaments.get(r.tournament_id); if(!t.rebuy?.enabled) return showOp('Torneo sin rebuy','danger');
+  const lv = currentLevel(t.id); if(!t.rebuy.levels.includes(lv)) return showOp('Fuera de ventana de rebuy','danger');
+  // Simplificado: permitir rebuy si el reg está activo
+  const cnt = [...db.registrations.values()].filter(x=>x.player_id===r.player_id && x.tournament_id===t.id && x.type==='rebuy').length;
+  if(cnt >= (t.rebuy.maxPerPlayer||Infinity)) return showOp('Máximo de rebuys alcanzado','danger');
+  const regId = uid('REG');
+  const rr = { id:regId, player_id:r.player_id, tournament_id:t.id, type:'rebuy', status:'confirmed', created_at:ts(), payment_id:uid('PAY'), seat_id:r.seat_id, stack_awarded:t.rebuy.stack };
+  db.registrations.set(regId, rr); log('register.rebuy','Registration',null,rr);
+  showOp(`Rebuy aplicado: +${t.rebuy.stack.toLocaleString()} fichas (REG ${regId})`,'ok'); updateKPIs();
+}
+function requestAddon(){
+  const id = el('liveRegId').value.trim(); const r=getReg(id); if(!r) return showOp('Registro no encontrado','danger');
+  const t = db.tournaments.get(r.tournament_id); if(!t.addon?.enabled) return showOp('No hay add-on en este torneo','danger');
+  const lv = currentLevel(t.id); if(lv !== t.addon.atLevel) return showOp('El add-on solo está disponible al cierre del período de recompras','danger');
+  const done = [...db.registrations.values()].some(x=>x.player_id===r.player_id && x.tournament_id===t.id && x.type==='addon');
+  if(done) return showOp('Ya utilizaste el add-on','danger');
+  const regId = uid('REG');
+  const rr = { id:regId, player_id:r.player_id, tournament_id:t.id, type:'addon', status:'confirmed', created_at:ts(), payment_id:uid('PAY'), seat_id:r.seat_id, stack_awarded:t.addon.stack };
+  db.registrations.set(regId, rr); log('register.addon','Registration',null,rr);
+  showOp(`Add-on aplicado: +${t.addon.stack.toLocaleString()} fichas (REG ${regId})`,'ok'); updateKPIs();
+}
+function showOp(t, tone='ok'){const b=el('opResult'); b.hidden=false; b.className=`alert ${tone==='danger'?'danger':''}`; b.textContent=t}
+
+// ======= Notificaciones =======
+function announce(text){const li=document.createElement('li'); li.textContent = `${new Date().toLocaleTimeString()} — ${text}`; el('liveFeed').prepend(li)}
+function closeTournament(){announce('Torneo cerrado. Calculando premios…');}
+
+// ======= Reportes / KPIs =======
+function updateKPIs(){
+  const totalRegs = [...db.registrations.values()].filter(r=>['entry','reentry'].includes(r.type)).length; 
+  const totalPlayers = new Set([...db.registrations.values()].filter(r=>['entry','reentry'].includes(r.type)).map(r=>r.player_id)).size;
+  const revenue = [...db.payments.values()].reduce((a,b)=>a+(b.status==='captured'?b.amount:0),0);
+  el('kpiConv').textContent = totalPlayers ? (Math.round((totalRegs/Math.max(totalPlayers,1))*100)/100).toFixed(2) : '—';
+  el('kpiArppu').textContent = totalPlayers ? money(Math.round(revenue/Math.max(totalPlayers,1))) : '—';
+  const re = [...db.registrations.values()].filter(r=>r.type==='reentry').length;
+  el('kpiRe').textContent = totalPlayers ? (Math.round((re/Math.max(totalPlayers,1))*100)/100).toFixed(2) : '—';
+
+  // KPIs panel TD
+  const k = el('kpis');
+  const tSel = el('tdTournament').value || demoTournaments[0].id;
+  const entrants = [...db.registrations.values()].filter(r=>r.tournament_id===tSel && r.type==='entry').length;
+  const rebuy = [...db.registrations.values()].filter(r=>r.tournament_id===tSel && r.type==='rebuy').length;
+  const addon = [...db.registrations.values()].filter(r=>r.tournament_id===tSel && r.type==='addon').length;
+  k.innerHTML = `
+    <div class="kpi"><div class="muted">Entradas</div><div style="font-size:1.6rem">${entrants}</div></div>
+    <div class="kpi"><div class="muted">Rebuys</div><div style="font-size:1.6rem">${rebuy}</div></div>
+    <div class="kpi"><div class="muted">Add-ons</div><div style="font-size:1.6rem">${addon}</div></div>
+    <div class="kpi"><div class="muted">Ocupación</div><div style="font-size:1.6rem">${Math.round((entrants/db.tournaments.get(tSel).capacity)*100)||0}%</div></div>`;
+}
+
+function exportAudit(){
+  el('auditDump').textContent = JSON.stringify(db.audit,null,2);
+}
+
+// ======= Perfil jugador (demo) =======
+function savePlayer(){
+  const name = el('playerName').value.trim(); const age = +el('playerAge').value || 0; const country = el('playerCountry').value.trim()||'MX';
+  const kyc = el('playerKYC').checked; const rg = el('playerRG').checked;
+  const pid = name? name.toLowerCase().replace(/\s+/g,'-'): uid('player');
+  const p = {id:pid, name, age, country, kyc, rg_ok:rg, wallet_id:uid('WAL')};
+  db.players.set(pid,p); state.currentPlayer = p; localStorage.setItem('demoPlayer', JSON.stringify(p));
+  alert('Perfil guardado como '+pid)
+}
+function loadPlayerFromStorage(){
+  try{const s=localStorage.getItem('demoPlayer'); if(!s) return; const p=JSON.parse(s); db.players.set(p.id,p); state.currentPlayer=p;
+    el('playerName').value=p.name||''; el('playerAge').value=p.age||''; el('playerCountry').value=p.country||''; el('playerKYC').checked=!!p.kyc; el('playerRG').checked=!!p.rg_ok;
+  }catch{}
+}
+
+// ======= Navegación y acciones =======
+window.openDetail=openDetail; window.startBuy=startBuy; window.applyFilters=applyFilters; window.resetFilters=resetFilters;
+window.buy=buy; window.assignAlternate=assignAlternate; window.breakTable=breakTable; window.checkInByCode=checkInByCode; window.checkInByPlayer=checkInByPlayer;
+window.requestReentry=requestReentry; window.requestRebuy=requestRebuy; window.requestAddon=requestAddon; window.showSection=showSection; window.announce=announce; window.closeTournament=closeTournament;
+
+window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
+
