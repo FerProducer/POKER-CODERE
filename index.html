@@ -75,6 +75,15 @@
       .kpis{grid-template-columns:1fr 1fr}
       .modal{min-width:92vw}
     }
+    /* opción 1: usando tu variable de texto */
+.tag { color: var(--text); }
+
+/* opción 2: blanco directo, por si prefieres fijo */
+.tag { color: #fff; }
+
+/* si tienes reglas que lo pisan, forza con !important */
+.tag { color: #fff !important; }
+
   </style>
 </head>
 <body>
